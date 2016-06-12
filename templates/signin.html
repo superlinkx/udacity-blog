@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block heading %}Sign In{% endblock %}
+{% block content %}
+	<div class="row">
+		<form action="/signin" method="post" id="signin-form" class="col-xs-12">
+			<label for="username">Username:</label>
+			<input type="text" name="username" value="{{username}}">
+			<label for="password">Password:</label>
+			<input type="password" name="password" value="{{password}}">
+			<label for="setcookie">Stay Signed In:</label>
+			<input type="checkbox" name="setcookie" {% if setcookie != None %}checked{% endif %}>
+			<button type="submit" class="btn btn-large">Sign In</button>
+		</form>
+	</div>
+{% endblock %}

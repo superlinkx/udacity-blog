@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Hello Blog</title>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+	</head>
+	<body class="container">
+		<header class="row">
+			<div class="heading col-md-8">
+				<a href="/"><h1>My Blog</h1></a>
+				<h2>{% block heading %}{% endblock %}</h2>
+			</div>
+			<div class="col-md-4 text-right">
+				<button class="btn btn-large"><a href="/signin">Sign In</a></button>
+				<button class="btn btn-large"><a href="/signup">Sign Up</a></button>
+			</div>
+		</header>
+		<main>
+		{% block content %}{% endblock %}
+		</main>
+	</body>
+</html>
