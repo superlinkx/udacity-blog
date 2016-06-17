@@ -1,5 +1,15 @@
 {% extends "base.html" %}
-{% block heading %}My Front Page{% endblock %}
+{% block error %}{{error}}{% endblock %}
+{% block heading %}{% if name != None %}{{name}}'s {% endif %}Front Page{% endblock %}
 {% block content %}
-	<span>My name is: {{name}}</span>
+	{% for post in posts %}
+		<div class="post">
+			<div class="post-title">
+				{{post.title}}
+			</div>
+			<div class="post-body">
+				{{post.body}}
+			</div>
+		</div>
+	{% endfor %}
 {% endblock %}

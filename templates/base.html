@@ -8,6 +8,11 @@
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
 	</head>
 	<body class="container">
+		<div class="alert alert-danger hidden" role="alert">
+			<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+			<span class="sr-only">Error: </span>
+			{% block error %}{% endblock %}
+		</div>
 		<header class="row">
 			<div class="heading col-md-8">
 				<a href="/"><h1>My Blog</h1></a>
