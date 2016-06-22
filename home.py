@@ -59,13 +59,14 @@ class Handler(webapp2.RequestHandler):
 		webapp2.RequestHandler.initialize(self, *a, **kw)
 		user = self.read_secure_cookie('user')
 		self.user = user and User.get_by_key_name(str(user))
+		self.username = str(user)
 
 #TODO: Move models to their own file
 #Models
 class Post(db.Model):
 	title = db.StringProperty(required = True)
 	body = db.TextProperty(required = True)
-	author = db.IntegerProperty(required = True)
+	author = db.StringProperty(required = True)
 	created = db.DateTimeProperty(auto_now_add = True)
 
 class User(db.Model):
@@ -118,11 +119,15 @@ class SignIn(Handler):
 
 		if username and password:
 			user = User.get_by_key_name(username)
-			if self.check_secure_hash(password, user.salt, user.pw_hash):
-				self.set_secure_cookie('user', str(username))
-				self.redirect("/")
+			if user:
+				if self.check_secure_hash(password, user.salt, user.pw_hash):
+					self.set_secure_cookie('user', str(username))
+					self.redirect("/")
+				else:
+					error = "Invalid user/password"
+					self.render("signin.html", error = error, username = username, setcookie = setcookie)
 			else:
-				error = "Invalid user/password"
+				error = "No user found by that name"
 				self.render("signin.html", error = error, username = username, setcookie = setcookie)
 		else:
 			error = "Missing username/password"
@@ -135,31 +140,70 @@ class Logout(Handler):
 
 class NewPost(Handler):
 	def get(self):
-		self.render("createpost.html")
+		if self.user:
+			self.render("createpost.html")
+		else:
+			self.redirect("/signin")
 
 	def post(self):
-		title = self.request.get("title")
-		body = self.request.get("body")
-		author = 1 #TODO: add author id to posts
+		if self.user:
+			title = self.request.get("title")
+			body = self.request.get("body")
+			author = self.username
 
-		if title and body and author:
-			p = Post(title = title, body = body, author = author)
-			p.put()
+			if title and body and author:
+				p = Post(title = title, body = body, author = author)
+				p.put()
 
-			self.redirect("/")
+				self.redirect("/")
+			else:
+				error = "Missing title, body, or author id"
+				self.render("createpost.html", error = error, title = title, body = body)
 		else:
-			error = "Missing title, body, or author id"
-			self.render("createpost.html", error = error, title = title, body = body)
+			self.redirect("/signin")
 
 class EditPost(Handler):
 	def get(self):
-		self.response.headers['Content-Type'] = 'text/plain'
-		self.response.out.write('Hello, webapp world!')
+		if self.user:
+		 	id = self.request.get("id")
+			if id:
+				post = Post.get_by_id(int(id))
+				if post and post.author == self.username:
+					self.render("editpost.html", id = id, title = post.title, body = post.body)
+		else:
+			self.redirect("/signin")
+
+	def post(self):
+		if self.user:
+			id = self.request.get("id")
+			if id:
+				post = Post.get_by_id(int(id))
+				if post and post.author == self.username:
+					title = self.request.get("title")
+					body = self.request.get("body")
+
+					post.title = title
+					post.body = body
+					post.put()
+
+			self.redirect("/")
+
+		else:
+			self.redirect("/signin")
 
 class DeletePost(Handler):
-	def get(self):
-		self.response.headers['Content-Type'] = 'text/plain'
-		self.response.out.write('Hello, webapp world!')
+	def post(self):
+		if self.user:
+			id = self.request.get("id")
+			if id:
+				post = Post.get_by_id(int(id))
+				if post and post.author == self.username:
+					db.delete(post.key())
+
+			self.redirect("/")
+
+		else:
+			self.redirect("/signin")
 
 class ViewPost(Handler):
 	def get(self):
