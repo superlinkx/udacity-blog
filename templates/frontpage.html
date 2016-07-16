@@ -1,5 +1,13 @@
 {% extends "base.html" %}
-{% block error %}{{error}}{% endblock %}
+{% block error %}
+	{% if error != None %}
+		<div class="alert alert-danger" role="alert">
+			<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+			<span class="sr-only">Error: </span>
+			<span>{{error}}</span>
+		</div>
+	{% endif %}
+{% endblock %}
 {% block heading %}{% if name != None %}{{name}}'s {% endif %}Front Page{% endblock %}
 {% block content %}
 	{% for post in posts %}

@@ -2,7 +2,11 @@
 {% block heading %}Create Post{% endblock %}
 {% block error %}
 	{% if error != None %}
-		{{error}}
+	<div class="alert alert-danger" role="alert">
+		<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+		<span class="sr-only">Error: </span>
+		<span>{{error}}</span>
+	</div>
 	{% endif %}
 {% endblock %}
 {% block content %}
