@@ -115,17 +115,28 @@ class FrontPage(Handler):
 
         if self.user:
             name = self.user.name
+            signedin = True
         else:
             name = None
+            signedin = False
 
-        self.render("frontpage.html", error=None, name=name, posts=posts)
+        self.render("frontpage.html", error=None, signedin=signedin, name=name,
+                    posts=posts)
 
 
 class SignUp(Handler):
     def get(self):
-        self.render("signup.html")
+        if self.user:
+            self.redirect("/")
+
+        self.render("signup.html", error=None, signedin=False)
 
     def post(self):
+        if self.user:
+            signedin = True
+            self.redirect("/")
+
+        error = None
         username = self.request.get('username')
         password = self.request.get('password')
         email = self.request.get('email')
@@ -142,17 +153,22 @@ class SignUp(Handler):
                 u.put()
                 self.redirect('/')
 
-        else:
-            error = "Missing required field"
-            self.render("signup.html", error=error, username=username,
-                        name=name, email=email)
+        error = "Missing required field"
+        self.render("signup.html", error=error, signedin=False,
+                    username=username, name=name, email=email)
 
 
 class SignIn(Handler):
     def get(self):
+        if self.user:
+            self.redirect("/")
+
         self.render("signin.html")
 
     def post(self):
+        if self.user:
+            self.redirect("/")
+
         username = self.request.POST.get('username')
         password = self.request.POST.get('password')
         setcookie = self.request.POST.get('setcookie')
@@ -165,20 +181,20 @@ class SignIn(Handler):
                     self.redirect("/")
                 else:
                     error = "Invalid user/password"
-                    self.render("signin.html", error=error, username=username,
-                                setcookie=setcookie)
+                    self.render("signin.html", error=error, signedin=False,
+                                username=username, setcookie=setcookie)
             else:
                 error = "No user found by that name"
-                self.render("signin.html", error=error, username=username,
-                            setcookie=setcookie)
+                self.render("signin.html", error=error, signedin=False,
+                            username=username, setcookie=setcookie)
         else:
             error = "Missing username/password"
-            self.render("signin.html", error=error, username=username,
-                        setcookie=setcookie)
+            self.render("signin.html", error=error, signedin=False,
+                        username=username, setcookie=setcookie)
 
 
 class Logout(Handler):
-    def get(self):
+    def post(self):
         self.response.headers.add_header('Set-Cookie', 'user=; Path=/')
         self.redirect("/")
 
@@ -186,7 +202,7 @@ class Logout(Handler):
 class NewPost(Handler):
     def get(self):
         if self.user:
-            self.render("createpost.html")
+            self.render("createpost.html", error=None, signedin=True)
         else:
             self.redirect("/signin")
 
@@ -203,8 +219,8 @@ class NewPost(Handler):
                 self.redirect("/")
             else:
                 error = "Missing title, body, or author id"
-                self.render("createpost.html", error=error, title=title,
-                            body=body)
+                self.render("createpost.html", error=error, signedin=True,
+                            title=title, body=body)
         else:
             self.redirect("/signin")
 
@@ -216,8 +232,8 @@ class EditPost(Handler):
             if id:
                 post = Post.get_by_id(int(id))
                 if post and post.author == self.username:
-                    self.render("editpost.html", id=id, title=post.title,
-                                body=post.body)
+                    self.render("editpost.html", signedin=True, id=id,
+                                title=post.title, body=post.body)
         else:
             self.redirect("/signin")
 
@@ -260,20 +276,13 @@ class ViewPost(Handler):
         self.response.headers['Content-Type'] = 'text/plain'
         self.response.out.write('Hello, webapp world!')
 
-
-class Dashboard(Handler):
-    def get(self):
-        self.response.headers['Content-Type'] = 'text/plain'
-        self.response.out.write('Hello, webapp world!')
-
 # App config
 app = webapp2.WSGIApplication()
 app.router.add((r'/', FrontPage))
 app.router.add((r'/signup', SignUp))
 app.router.add((r'/signin', SignIn))
 app.router.add((r'/logout', Logout))
-app.router.add((r'/create', NewPost))
-app.router.add((r'/edit', EditPost))
-app.router.add((r'/delete', DeletePost))
-app.router.add((r'/view', ViewPost))
-app.router.add((r'/dashboard', Dashboard))
+app.router.add((r'/createpost', NewPost))
+app.router.add((r'/editpost', EditPost))
+app.router.add((r'/deletepost', DeletePost))
+app.router.add((r'/viewpost', ViewPost))

@@ -3,24 +3,47 @@
 	<head>
 		<title>Hello Blog</title>
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+		<link rel="stylesheet" href="/css/main.css">
 
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
 	</head>
 	<body class="container">
 		{% block error %}{% endblock %}
-		<header class="row">
-			<div class="heading col-md-8">
+		<header class="row vertical-align">
+			<div class="heading col-xs-8">
 				<a href="/"><h1>My Blog</h1></a>
 				<h2>{% block heading %}{% endblock %}</h2>
 			</div>
-			<div class="col-md-4 text-right">
-				<button class="btn btn-large"><a href="/signin">Sign In</a></button>
-				<button class="btn btn-large"><a href="/signup">Sign Up</a></button>
+			<div class="col-xs-4">
+				{% if signedin == False %}
+				<button class="btn btn-large" id="signin-button">Sign In</button>
+				<button class="btn btn-large" id="signup-button">Sign Up</button>
+				{% endif %}
+				{% if signedin == True %}
+				<button class="btn btn-large" id="createpost-button">Create Post</button>
+				<button class="btn btn-large" id="logout-button">Logout</button>
+				{% endif %}
 			</div>
 		</header>
 		<main>
 		{% block content %}{% endblock %}
 		</main>
+		<script>
+			$(function() {
+				$("#signin-button").click(function() {
+					location.href="/signin"
+				});
+				$("#signup-button").click(function() {
+					location.href="/signup"
+				});
+				$("#logout-button").click(function() {
+					$('<form method="POST" action="/logout"></form>').submit();
+				});
+				$("#createpost-button").click(function() {
+					location.href="/createpost"
+				});
+			});
+		</script>
 	</body>
 </html>
