@@ -11,6 +11,11 @@
 {% endblock %}
 {% block content %}
 	<div class="row">
+		<div class="col-xs-12">
+			Already a user? <a href="/signin">Sign In!</a>
+		</div>
+	</div>
+	<div class="row">
 		<form action="/signup" method="post" id="newuser-form" class="col-xs-12">
 			<label for="username">Username:</label>
 			<input type="text" name="username" value="{{username}}">

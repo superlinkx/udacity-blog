@@ -1,6 +1,11 @@
 {% extends "base.html" %}
 {% block heading %}Sign In{% endblock %}
 {% block content %}
+<div class="row">
+	<div class="col-xs-12">
+		Not a user? <a href="/signup">Signup!</a>
+	</div>
+</div>
 	<div class="row">
 		<form action="/signin" method="post" id="signin-form" class="col-xs-12">
 			<label for="username">Username:</label>
