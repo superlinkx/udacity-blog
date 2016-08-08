@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block heading %}View Post{% endblock %}
+{% block error %}
+	{% if error != None %}
+	<div class="alert alert-danger" role="alert">
+		<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+		<span class="sr-only">Error: </span>
+		<span>{{error}}</span>
+	</div>
+	{% endif %}
+{% endblock %}
+{% block content %}
+	<div class="row">
+    <div class="col-xs-12">
+      <h2>{{post.title}}</h2>
+      <p>{{post.body}}</p>
+    </div>
+	</div>
+{% endblock %}

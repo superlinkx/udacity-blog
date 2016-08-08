@@ -5,6 +5,7 @@ import jinja2
 import webapp2
 import hashlib
 import hmac
+from slugify import slugify
 
 from google.appengine.ext import db
 
@@ -75,6 +76,21 @@ class Post(db.Model):
     title = db.StringProperty(required=True)
     body = db.TextProperty(required=True)
     author = db.StringProperty(required=True)
+    slug = db.StringProperty(required=True)
+    created = db.DateTimeProperty(auto_now_add=True)
+
+    @classmethod
+    def by_slug(cls, slug):
+        return Post.all().filter('slug = ', slug).get()
+
+    @classmethod
+    def get_five(cls):
+        return Post.all().fetch(limit=5)
+
+
+class Comment(db.Model):
+    body = db.TextProperty(required=True)
+    author = db.StringProperty(required=True)
     created = db.DateTimeProperty(auto_now_add=True)
 
 
@@ -91,13 +107,11 @@ class User(db.Model):
 
     @classmethod
     def by_name(cls, name):
-        u = User.all().filter('username = ', name).get()
-        return u
+        return User.all().filter('username = ', name).get()
 
     @classmethod
     def by_email(cls, email):
-        u = User.all().filter('email = ', email).get()
-        return u
+        return User.all().filter('email = ', email).get()
 
     @classmethod
     def register(cls, username, email, name, salt, pw_hash):
@@ -111,7 +125,7 @@ class User(db.Model):
 # Handlers
 class FrontPage(Handler):
     def get(self):
-        posts = db.GqlQuery("SELECT * FROM Post ORDER BY created DESC")
+        posts = Post.get_five()
 
         if self.user:
             name = self.user.name
@@ -213,7 +227,8 @@ class NewPost(Handler):
             author = self.username
 
             if title and body and author:
-                p = Post(title=title, body=body, author=author)
+                slug = slugify(title)
+                p = Post(slug=slug, title=title, body=body, author=author)
                 p.put()
 
                 self.redirect("/")
@@ -273,8 +288,14 @@ class DeletePost(Handler):
 
 class ViewPost(Handler):
     def get(self):
-        self.response.headers['Content-Type'] = 'text/plain'
-        self.response.out.write('Hello, webapp world!')
+        slug = self.request.get("slug")
+        post = Post.by_slug(slug)
+
+        if post is not None:
+            error = None
+        else:
+            error = "Post not found!"
+        self.render("viewpost.html", post=post, error=error)
 
 # App config
 app = webapp2.WSGIApplication()
