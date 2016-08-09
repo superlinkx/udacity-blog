@@ -12,8 +12,31 @@
 {% block content %}
 	<div class="row">
     <div class="col-xs-12">
-      <h2>{{post.title}}</h2>
+      <h3>{{post.title}}</h3>
       <p>{{post.body}}</p>
     </div>
+	</div>
+	<div class="row">
+		<div class="col-xs-12">
+			<h4>Comments</h4>
+			{% for comment in comments %}
+				<div class="row">
+					<div class="col-xs-12">
+						<p class="comment-body">{{comment.body}}</p>
+						<span class="author">{{comment.author}}</span>
+						<span class="timestamp">{{comment.created}}</span>
+					</div>
+				</div>
+			{% endfor %}
+			<div class="row">
+				<div class="col-xs-12">
+					<form action="/createcomment" method="POST">
+						<input type="hidden" name="post-id" value="{{slug}}">
+						<textarea class="comment-box" name="comment"></textarea>
+						<button type="submit" class="btn btn-large" id="comment-submit">Submit Comment</button>
+					</form>
+				</div>
+			</div>
+		</div>
 	</div>
 {% endblock %}

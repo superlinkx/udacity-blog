@@ -1,13 +1,13 @@
 import models
+import time
 from slugify import slugify
-import models
 from handler import Handler
 
 
 # Handlers
 class FrontPage(Handler):
     def get(self):
-        posts = models.Post.get_five()
+        posts = models.Post.get_all()
 
         if self.user:
             name = self.user.name
@@ -40,13 +40,14 @@ class SignUp(Handler):
         salt = self.generate_salt()
 
         if username and password and email and name and salt:
-            u = models.User.by_name(username)
-            if u:
+            pw_hash = self.generate_secure_hash(password, salt)
+            u = models.User.register(username, email, name, salt, pw_hash)
+            if u is False:
                 error = "That username already exists. Please choose another."
             else:
-                pw_hash = self.generate_secure_hash(password, salt)
-                u = models.User.register(username, email, name, salt, pw_hash)
                 u.put()
+                self.set_secure_cookie('user', str(username))
+                time.sleep(0.1)  # Hack to fix inconsistency
                 self.redirect('/')
 
         error = "Missing required field"
@@ -103,6 +104,7 @@ class NewPost(Handler):
             self.redirect("/signin")
 
     def post(self):
+        error = None
         if self.user:
             title = self.request.get("title")
             body = self.request.get("body")
@@ -110,16 +112,21 @@ class NewPost(Handler):
 
             if title and body and author:
                 slug = slugify(title)
-                p = Post(slug=slug, title=title, body=body, author=author)
-                p.put()
-
-                self.redirect("/")
+                p = models.Post.create(slug=slug, title=title,
+                                       body=body, author=author)
+                if p is False:
+                    error = "Title already used. Try a different one."
+                else:
+                    p.put()
+                    time.sleep(0.1)  # Fix for eventual consistency
+                    self.redirect("/")
             else:
                 error = "Missing title, body, or author id"
-                self.render("createpost.html", error=error, signedin=True,
-                            title=title, body=body)
         else:
             self.redirect("/signin")
+
+        self.render("createpost.html", error=error, signedin=True,
+                    title=title, body=body)
 
 
 class EditPost(Handler):
@@ -169,12 +176,33 @@ class DeletePost(Handler):
 
 
 class ViewPost(Handler):
-    def get(self):
-        slug = self.request.get("slug")
+    def get(self, slug):
         post = models.Post.by_slug(slug)
 
         if post is not None:
             error = None
+            comments = models.Comment.get_all(slug)
+            print(comments)
         else:
             error = "Post not found!"
-        self.render("viewpost.html", post=post, error=error)
+        self.render("viewpost.html", slug=slug, post=post, comments=comments,
+                    error=error)
+
+
+class CreateComment(Handler):
+    def post(self):
+        if self.user:
+            body = self.request.get("comment")
+            post = self.request.get("post-id")
+            author = self.username
+
+            if body:
+                comment = models.Comment.create(author=author, body=body,
+                                                post=post)
+                comment.put()
+                time.sleep(0.1)  # Fix for eventual consistency
+                self.redirect(self.request.referrer)
+            else:
+                self.redirect("/")  # TODO: Should give an error not redirect
+        else:
+            self.redirect("/signin")
