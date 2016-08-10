@@ -37,11 +37,35 @@ class Post(db.Model):
                         author=author
                         )
 
+    @classmethod
+    def edit(cls, slug, title, body, user):
+        post = Post.by_slug(slug)
+        if post:
+            if user == post.author:
+                post.title = title
+                post.body = body
+                post.put()
+                return True
+        return False
+
+    @classmethod
+    def delete(cls, slug, user):
+        post = Post.by_slug(slug)
+        if post:
+            if user == post.author:
+                db.delete(post)
+                return True
+        return False
+
 
 class Comment(db.Model):
     body = db.TextProperty(required=True)
     author = db.StringProperty(required=True)
     created = db.DateTimeProperty(auto_now_add=True)
+
+    @classmethod
+    def by_id(cls, parent, cid):
+        return Comment.get_by_id(cid, parent=parent)
 
     @classmethod
     def get_all(cls, post):
@@ -54,6 +78,23 @@ class Comment(db.Model):
                        body=body,
                        author=author,
                        )
+
+    @classmethod
+    def update(cls, parent, cid, body, user):
+        comment = Comment.by_id(cid=cid, parent=parent)
+        if comment and comment.author == user:
+            comment.body = body
+            comment.put()
+            return True
+        return False
+
+    @classmethod
+    def delete(cls, parent, cid, user):
+        comment = Comment.by_id(cid=cid, parent=parent)
+        if comment and comment.author == user:
+            db.delete(comment)
+            return True
+        return False
 
 
 class User(db.Model):

@@ -25,6 +25,9 @@
 						<p class="comment-body">{{comment.body}}</p>
 						<span class="author">{{comment.author}}</span>
 						<span class="timestamp">{{comment.created}}</span>
+						{% if comment.author == currentuser %}
+							{{comment.key().id()}}
+						{% endif %}
 					</div>
 				</div>
 			{% endfor %}

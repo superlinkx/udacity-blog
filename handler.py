@@ -63,6 +63,11 @@ class Handler(webapp2.RequestHandler):
         cookie_val = self.request.cookies.get(name)
         return cookie_val and self.check_secure_val(cookie_val)
 
+    def error_404(self, errmsg="Page Not Found"):
+        self.error(404)
+        error = "Not Found"
+        self.render("error.html", error=error, errmsg=errmsg, code=404)
+
     def initialize(self, *a, **kw):
         webapp2.RequestHandler.initialize(self, *a, **kw)
         user = self.read_secure_cookie('user')

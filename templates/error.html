@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block heading %}Error {{code}}{% endblock %}
+{% block error %}
+	{% if error != None %}
+	<div class="alert alert-danger" role="alert">
+		<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+		<span class="sr-only">Error: </span>
+		<span>{{errmsg}}</span>
+	</div>
+	{% endif %}
+{% endblock %}
+{% block content %}
+<span>{{error}}</span>
+{% endblock %}

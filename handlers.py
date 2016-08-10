@@ -130,29 +130,36 @@ class NewPost(Handler):
 
 
 class EditPost(Handler):
-    def get(self):
+    def get(self, slug):
         if self.user:
-            id = self.request.get("id")
-            if id:
-                post = models.Post.get_by_id(int(id))
+            if slug:
+                post = models.Post.by_slug(slug)
                 if post and post.author == self.username:
-                    self.render("editpost.html", signedin=True, id=id,
+                    self.render("editpost.html", slug=slug,
                                 title=post.title, body=post.body)
-        else:
-            self.redirect("/signin")
+                    return
+                else:
+                    self.render("editpost.html", slug=slug,
+                                title=post.title, body=post.body)
+                    return
+            self.redirect(self.request.referrer or "/")
 
-    def post(self):
+        self.redirect("/signin")
+
+    def post(self, slug):
         if self.user:
-            id = self.request.get("id")
-            if id:
-                post = models.Post.get_by_id(int(id))
-                if post and post.author == self.username:
-                    title = self.request.get("title")
-                    body = self.request.get("body")
+            if slug:
+                title = self.request.get("title")
+                body = self.request.get("body")
+                if title and body:
+                    post = models.Post.edit(slug=slug, title=title, body=body,
+                                            user=self.username)
+                    if post is False:
+                        self.render("editpost.html", slug=slug,
+                                    title=post.title, body=post.body)
+                        return
 
-                    post.title = title
-                    post.body = body
-                    post.put()
+                self.redirect("viewpost/"+slug)
 
             self.redirect("/")
 
@@ -161,15 +168,15 @@ class EditPost(Handler):
 
 
 class DeletePost(Handler):
-    def post(self):
+    def post(self, slug):
         if self.user:
-            id = self.request.get("id")
-            if id:
-                post = models.Post.get_by_id(int(id))
-                if post and post.author == self.username:
-                    db.delete(post.key())
-
-            self.redirect("/")
+            if slug:
+                post = models.Post.delete(slug=slug, user=self.username)
+                if post is False:
+                    self.redirect(self.request.referrer or "/")
+                self.redirect("/")
+            else:
+                self.redirect(self.request.referrer or "/")
 
         else:
             self.redirect("/signin")
@@ -182,11 +189,10 @@ class ViewPost(Handler):
         if post is not None:
             error = None
             comments = models.Comment.get_all(slug)
-            print(comments)
+            self.render("viewpost.html", slug=slug, error=error, post=post,
+                        comments=comments, currentuser=self.username)
         else:
-            error = "Post not found!"
-        self.render("viewpost.html", slug=slug, post=post, comments=comments,
-                    error=error)
+            self.error_404()
 
 
 class CreateComment(Handler):
@@ -196,13 +202,69 @@ class CreateComment(Handler):
             post = self.request.get("post-id")
             author = self.username
 
-            if body:
+            if body and author and post:
                 comment = models.Comment.create(author=author, body=body,
                                                 post=post)
                 comment.put()
                 time.sleep(0.1)  # Fix for eventual consistency
-                self.redirect(self.request.referrer)
+                self.redirect(self.request.referrer or "/")
             else:
-                self.redirect("/")  # TODO: Should give an error not redirect
+                self.redirect(self.request.referrer or "/")
+        else:
+            self.redirect("/signin")
+
+
+class EditComment(Handler):
+    def get(self, slug, cid):
+        cid = int(cid)
+        if self.user:
+            if cid and slug:
+                parent_key = models.Post.key_by_slug(slug)
+                comment = models.Comment.by_id(cid=cid, parent=parent_key)
+                if self.username == comment.author:
+                    self.render("editcomment.html", cid=cid, slug=slug,
+                                body=comment.body, error=None)
+                    return
+            self.redirect(self.request.referrer or "/")
+        self.redirect("/signin")
+
+    def post(self, slug, cid):
+        cid = int(cid)
+        if self.user:
+            body = self.request.get("body")
+
+            if body and cid and slug:
+                print(slug)
+                parent_key = models.Post.key_by_slug(slug)
+                comment = models.Comment.update(cid=cid, body=body,
+                                                user=self.username,
+                                                parent=parent_key)
+                if comment is False:
+                    self.redirect(self.request.referrer or "/")
+                else:
+                    time.sleep(0.1)  # Fix for eventual consistency
+                    self.redirect("/viewpost/"+slug or "/")
+            else:
+                self.redirect(self.request.referrer or "/")
+        else:
+            self.redirect("/signin")
+
+
+class DeleteComment(Handler):
+    def post(self, slug, cid):
+        cid = int(cid)
+        if self.user:
+            if cid and slug:
+                parent_key = models.Post.key_by_slug(slug)
+                comment = models.Comment.delete(cid=cid,
+                                                user=self.username,
+                                                parent=parent_key)
+                if comment is False:
+                    self.redirect(self.request.referrer or "/")
+                else:
+                    time.sleep(0.1)  # Fix for eventual consistency
+                    self.redirect(self.request.referrer or "/")
+            else:
+                self.redirect(self.request.referrer or "/")
         else:
             self.redirect("/signin")
