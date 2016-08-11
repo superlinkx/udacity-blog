@@ -212,9 +212,8 @@ class ViewPost(Handler):
 class LikePost(Handler):
     def post(self, slug):
         result = False
+        post = models.Post.by_slug(slug)
         if self.user:
-            post = models.Post.by_slug(slug)
-
             if post:
                 result = models.Like.toggle(user=self.username, post=post)
                 if result is False:
