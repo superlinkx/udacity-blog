@@ -5,3 +5,7 @@ header .btn {
 .liked {
 	background: blue
 }
+
+p {
+	white-space: pre-wrap;
+}
