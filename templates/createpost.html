@@ -1,17 +1,15 @@
 {% extends "base.html" %}
 {% block heading %}Create Post{% endblock %}
 {% block error %}
-	{% if error != None %}
-	<div class="alert alert-danger" role="alert">
+	<div class="alert alert-danger{% if error == None %} hidden{% endif %}" role="alert">
 		<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
 		<span class="sr-only">Error: </span>
-		<span>{{error}}</span>
+		<span class="error-msg">{{error}}</span>
 	</div>
-	{% endif %}
 {% endblock %}
 {% block content %}
 	<div class="row">
-		<form action="/createpost" method="post" id="newpost-form" class="col-xs-12">
+		<form action="/post/create" method="post" id="newpost-form" class="col-xs-12">
 			<label for="title">Title:</label>
 			<input type="text" name="title" value="{{title}}">
 			<label for="body">Body:</label>

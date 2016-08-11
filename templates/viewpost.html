@@ -1,18 +1,18 @@
 {% extends "base.html" %}
 {% block heading %}View Post{% endblock %}
 {% block error %}
-	{% if error != None %}
-	<div class="alert alert-danger" role="alert">
+	<div class="alert alert-danger{% if error == None %} hidden{% endif %}" role="alert">
 		<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
 		<span class="sr-only">Error: </span>
-		<span>{{error}}</span>
+		<span class="error-msg">{{error}}</span>
 	</div>
-	{% endif %}
 {% endblock %}
 {% block content %}
 	<div class="row">
     <div class="col-xs-12">
-      <h3>{{post.title}}</h3>
+      <h3>{{post.title}} - <span id="likes" class="likes">{{numlikes}}</span>
+				<button class="btn btn-small{% if liked %} liked{% endif %}" id="likebutton">Like</button>
+			</h3>
       <p>{{post.body}}</p>
     </div>
 	</div>
@@ -33,7 +33,7 @@
 			{% endfor %}
 			<div class="row">
 				<div class="col-xs-12">
-					<form action="/createcomment" method="POST">
+					<form action="/comment/create" method="POST">
 						<input type="hidden" name="post-id" value="{{slug}}">
 						<textarea class="comment-box" name="comment"></textarea>
 						<button type="submit" class="btn btn-large" id="comment-submit">Submit Comment</button>
@@ -42,4 +42,23 @@
 			</div>
 		</div>
 	</div>
+	<script>
+		$('#likebutton').click(function(){
+			$.post({url: "/post/like/{{slug}}"}).done(function(data){
+				if (data.result == "liked")
+					$('#likebutton').addClass("liked")
+				else if (data.result == "unliked")
+					$('#likebutton').removeClass("liked")
+				if (data.numlikes >= 0)
+					$('#likes').html(data.numlikes)
+
+				if (data.error) {
+					$(".error-msg").html(data.error)
+					$(".alert").removeClass('hidden')
+				} else {
+					$(".alert").addClass('hidden')
+				}
+			})
+		});
+	</script>
 {% endblock %}

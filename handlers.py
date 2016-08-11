@@ -60,7 +60,7 @@ class SignIn(Handler):
         if self.user:
             self.redirect("/")
 
-        self.render("signin.html")
+        self.render("signin.html", error=None, signedin=False)
 
     def post(self):
         if self.user:
@@ -136,11 +136,13 @@ class EditPost(Handler):
                 post = models.Post.by_slug(slug)
                 if post and post.author == self.username:
                     self.render("editpost.html", slug=slug,
-                                title=post.title, body=post.body)
+                                title=post.title, body=post.body,
+                                signedin=True, error=None)
                     return
                 else:
                     self.render("editpost.html", slug=slug,
-                                title=post.title, body=post.body)
+                                title=post.title, body=post.body,
+                                signedin=True, error=None)
                     return
             self.redirect(self.request.referrer or "/")
 
@@ -153,13 +155,14 @@ class EditPost(Handler):
                 body = self.request.get("body")
                 if title and body:
                     post = models.Post.edit(slug=slug, title=title, body=body,
-                                            user=self.username)
+                                            user=self.username, signedin=True)
                     if post is False:
                         self.render("editpost.html", slug=slug,
-                                    title=post.title, body=post.body)
+                                    title=post.title, body=post.body,
+                                    signedin=True)
                         return
 
-                self.redirect("viewpost/"+slug)
+                self.redirect("/post/view/"+slug)
 
             self.redirect("/")
 
@@ -185,14 +188,52 @@ class DeletePost(Handler):
 class ViewPost(Handler):
     def get(self, slug):
         post = models.Post.by_slug(slug)
+        if self.user:
+            signedin = True
+        else:
+            signedin = False
 
         if post is not None:
             error = None
             comments = models.Comment.get_all(slug)
+            numlikes = models.Like.count_by_parent(post)
+            like = models.Like.get_by_user(user=self.username, post=post)
+            if like:
+                like = True
+            else:
+                like = False
             self.render("viewpost.html", slug=slug, error=error, post=post,
-                        comments=comments, currentuser=self.username)
+                        comments=comments, currentuser=self.username,
+                        liked=like, numlikes=numlikes, signedin=signedin)
         else:
             self.error_404()
+
+
+class LikePost(Handler):
+    def post(self, slug):
+        result = False
+        if self.user:
+            post = models.Post.by_slug(slug)
+
+            if post:
+                result = models.Like.toggle(user=self.username, post=post)
+                if result is False:
+                    error = "Author's cannot like their own posts"
+                else:
+                    error = None
+            else:
+                error = "Post does not exist"
+        else:
+            error = "Not logged in"
+
+        time.sleep(0.1)
+        numlikes = models.Like.count_by_parent(post=post)
+
+        self.render_json({
+                          'error': error,
+                          'result': result,
+                          'numlikes': numlikes,
+                          })
 
 
 class CreateComment(Handler):
@@ -223,7 +264,7 @@ class EditComment(Handler):
                 comment = models.Comment.by_id(cid=cid, parent=parent_key)
                 if self.username == comment.author:
                     self.render("editcomment.html", cid=cid, slug=slug,
-                                body=comment.body, error=None)
+                                body=comment.body, error=None, signedin=True)
                     return
             self.redirect(self.request.referrer or "/")
         self.redirect("/signin")
@@ -243,7 +284,7 @@ class EditComment(Handler):
                     self.redirect(self.request.referrer or "/")
                 else:
                     time.sleep(0.1)  # Fix for eventual consistency
-                    self.redirect("/viewpost/"+slug or "/")
+                    self.redirect("/post/view/"+slug or "/")
             else:
                 self.redirect(self.request.referrer or "/")
         else:

@@ -97,6 +97,32 @@ class Comment(db.Model):
         return False
 
 
+class Like(db.Model):
+    user = db.StringProperty(required=True)
+
+    @classmethod
+    def get_by_user(cls, user, post):
+        return Like.all().ancestor(post.key()).filter("user = ", user).get()
+
+    @classmethod
+    def count_by_parent(cls, post):
+        return Like.all(keys_only=True).ancestor(post.key()).count()
+
+    @classmethod
+    def toggle(cls, user, post):
+        print(user)
+        like = Like.get_by_user(user=user, post=post)
+        if user != post.author:
+            if not like:
+                like = Like(parent=post.key(), user=user)
+                like.put()
+                return "liked"
+            else:
+                db.delete(like)
+                return "unliked"
+        return False
+
+
 class User(db.Model):
     username = db.StringProperty(required=True)
     name = db.StringProperty(required=True)

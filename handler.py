@@ -5,6 +5,7 @@ import jinja2
 import webapp2
 import hashlib
 import hmac
+import json
 import models
 
 
@@ -30,6 +31,10 @@ class Handler(webapp2.RequestHandler):
 
     def render(self, template, **kw):
         self.write(self.render_str(template, **kw))
+
+    def render_json(self, data):
+        self.response.headers['Content-Type'] = 'application/json'
+        self.response.out.write(json.dumps(data))
 
     def generate_salt(self):
         return ''.join(random.choice(string.letters) for x in xrange(10))

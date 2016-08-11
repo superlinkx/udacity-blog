@@ -1,13 +1,11 @@
 {% extends "base.html" %}
 {% block heading %}Sign Up{% endblock %}
 {% block error %}
-	{% if error != None %}
-	<div class="alert alert-danger" role="alert">
+	<div class="alert alert-danger{% if error == None %} hidden{% endif %}" role="alert">
 		<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
 		<span class="sr-only">Error: </span>
-		<span>{{error}}</span>
+		<span class="error-msg">{{error}}</span>
 	</div>
-	{% endif %}
 {% endblock %}
 {% block content %}
 	<div class="row">
