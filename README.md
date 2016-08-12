@@ -12,3 +12,7 @@ This is a blog written on App Engine for my Full Stack nanodegree
 - Run `dev_appserver.py .` within the source directory
 - Go to [http://localhost:8080](http://localhost:8080) in your browser
 - Browse the application. Any edits to source files should reload the server automatically.
+
+#### Deploy to an App Engine instance
+- Create a new project on cloud.google.com
+- Deploy with `appcfg.py -A [YOUR_PROJECT_ID] -V v1 update ./` where `[YOUR_PROJECT_ID]` is the project id for your new project
