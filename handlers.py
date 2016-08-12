@@ -155,7 +155,7 @@ class EditPost(Handler):
                 body = self.request.get("body")
                 if title and body:
                     post = models.Post.edit(slug=slug, title=title, body=body,
-                                            user=self.username, signedin=True)
+                                            user=self.username)
                     if post is False:
                         self.render("editpost.html", slug=slug,
                                     title=post.title, body=post.body,
@@ -163,8 +163,9 @@ class EditPost(Handler):
                         return
 
                 self.redirect("/post/view/"+slug)
+                return
 
-            self.redirect("/")
+            self.redirect(self.request.referrer or "/")
 
         else:
             self.redirect("/signin")
@@ -177,6 +178,7 @@ class DeletePost(Handler):
                 post = models.Post.delete(slug=slug, user=self.username)
                 if post is False:
                     self.redirect(self.request.referrer or "/")
+                time.sleep(0.1)
                 self.redirect("/")
             else:
                 self.redirect(self.request.referrer or "/")

@@ -14,6 +14,10 @@
 				<button class="btn btn-small{% if liked %} liked{% endif %}" id="likebutton">Like</button>
 			</h3>
       <p>{{post.body}}</p>
+			{% if currentuser == post.author %}
+				<button class="btn btn-large" id="edit-post">Edit Post</button>
+				<button class="btn btn-large" id="delete-post">Delete Post</button>
+			{% endif %}
     </div>
 	</div>
 	<div class="row">
@@ -26,7 +30,8 @@
 						<span class="author">{{comment.author}}</span>
 						<span class="timestamp">{{comment.created}}</span>
 						{% if comment.author == currentuser %}
-							{{comment.key().id()}}
+							<button class="btn btn-large edit-comment" data-id="{{comment.key().id()}}">Edit Comment</button>
+							<button class="btn btn-large delete-comment" data-id="{{comment.key().id()}}">Delete Comment</button>
 						{% endif %}
 					</div>
 				</div>
@@ -59,6 +64,22 @@
 					$(".alert").addClass('hidden')
 				}
 			})
+		});
+
+		$('#edit-post').click(function() {
+			location.href = "/post/edit/{{slug}}"
+		});
+
+		$('#delete-post').click(function() {
+			$("<form action='/post/delete/{{slug}}' method='POST'></form>").submit();
+		});
+
+		$('.edit-comment').click(function() {
+			location.href = '/comment/edit/{{slug}}/' + $(this).attr('data-id')
+		});
+
+		$('.delete-comment').click(function() {
+			$("<form action='/comment/delete/{{slug}}/" + $(this).attr('data-id') + "' method='POST'></form>").submit()
 		});
 	</script>
 {% endblock %}
