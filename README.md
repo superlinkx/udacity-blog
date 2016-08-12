@@ -7,6 +7,7 @@ This is a blog written on App Engine for my Full Stack nanodegree
 #### Requirements
 - Google App Engine SDK for Python [Download and install instructions](https://cloud.google.com/appengine/downloads#Google_App_Engine_SDK_for_Python)
 - Clone this repository: `git clone https://github.com/superlinkx/udacity-blog`
+- Install 3rd-Party components with pip: `pip install -r requirements.txt -t lib`
 
 #### Run a development instance
 - Run `dev_appserver.py .` within the source directory
