@@ -9,16 +9,26 @@
 {% endblock %}
 {% block content %}
 	<div class="row">
-		<form action="/comment/edit/{{slug}}/{{cid}}" method="post" id="editcomment-form" class="col-xs-12">
-			<label for="body">Comment:</label>
-			<textarea name="body">{{body}}</textarea>
-			<button class="btn btn-large" id="cancel">Cancel</button>
-			<button type="submit" class="btn btn-large">Submit Comment</button>
-		</form>
-		<script>
-			$("#cancel").click(function() {
-				location.href = "/post/view/{{slug}}";
-			});
-		</script>
+		<div class="col-sm-12">
+			<form action="/comment/edit/{{slug}}/{{cid}}" method="post" id="editcomment-form" class="form-horizontal">
+				<div class="form-group">
+					<label for="body" class="col-sm-offset-1 col-sm-2 control-label">Comment:</label>
+					<div class="col-sm-6">
+						<textarea class="comment-box" name="body">{{body}}</textarea>
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="col-sm-offset-3 col-sm-6">
+						<button class="btn btn-large" id="cancel">Cancel</button>
+						<button type="submit" class="btn btn-large btn-success">Submit Comment</button>
+					</div>
+				</div>
+			</form>
+			<script>
+				$("#cancel").click(function() {
+					location.href = "/post/view/{{slug}}";
+				});
+			</script>
+		</div>
 	</div>
 {% endblock %}

@@ -1,11 +1,57 @@
+html, body {
+	font-family: 'Source Sans Pro', sans-serif;
+	font-size: 14px;
+	color: #464646;
+}
+
+input, textarea {
+	width: 100%;
+}
+
+textarea {
+	height: 240px;
+}
+
+input[type="checkbox"] {
+	margin-top: 12px;
+	width: auto;
+}
+
 header .btn {
 	margin-top: 20px;
 }
 
-.liked {
-	background: blue
+.btn-small {
+	padding: 2px 4px;
 }
 
-p {
+.like-container {
+	margin-top: 14px;
+}
+
+.like {
+	background: #dcdcdc;
+}
+
+.liked {
+	background: gold;
+}
+
+.post-preview {
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	overflow: hidden;
+}
+
+.post-body {
 	white-space: pre-wrap;
+}
+
+.comment-box {
+	height: 75px;
+}
+
+/* Mobile Media Queries */
+@media only screen and (max-width: 767px) {
+
 }

@@ -8,78 +8,90 @@
 	</div>
 {% endblock %}
 {% block content %}
-	<div class="row">
-    <div class="col-xs-12">
-      <h3>{{post.title}} - <span id="likes" class="likes">{{numlikes}}</span>
-				<button class="btn btn-small{% if liked %} liked{% endif %}" id="likebutton">Like</button>
-			</h3>
-      <p>{{post.body}}</p>
-			{% if currentuser == post.author %}
-				<button class="btn btn-large" id="edit-post">Edit Post</button>
-				<button class="btn btn-large" id="delete-post">Delete Post</button>
-			{% endif %}
-    </div>
+<div class="row">
+  <div class="col-md-offset-2 col-md-4">
+    <h3>{{post.title}}</h3>
 	</div>
-	<div class="row">
-		<div class="col-xs-12">
-			<h4>Comments</h4>
-			{% for comment in comments %}
-				<div class="row">
-					<div class="col-xs-12">
-						<p class="comment-body">{{comment.body}}</p>
-						<span class="author">{{comment.author}}</span>
-						<span class="timestamp">{{comment.created}}</span>
-						{% if comment.author == currentuser %}
-							<button class="btn btn-large edit-comment" data-id="{{comment.key().id()}}">Edit Comment</button>
-							<button class="btn btn-large delete-comment" data-id="{{comment.key().id()}}">Delete Comment</button>
-						{% endif %}
-					</div>
-				</div>
-			{% endfor %}
+	<div class="col-md-4">
+		<div class="like-container pull-right">
+			<button class="{% if liked %}liked {% endif %}btn btn-small like" id="likebutton"><span id="likes" class="likes">{{numlikes}}</span> - Like</button>
+		</div>
+	</div>
+</div>
+<div class="row">
+  <div class="col-md-offset-2 col-md-8">
+		<div class="post-body">{{post.body}}</div>
+		<hr>
+	</div>
+</div>
+{% if currentuser == post.author %}
+<div class="row">
+	<div class="col-md-offset-2 col-md-8">
+		<button class="btn btn-large btn-info" id="edit-post">Edit Post</button>
+		<button class="btn btn-large btn-danger" id="delete-post">Delete Post</button>
+	</div>
+</div>
+{% endif %}
+<div class="row">
+	<div class="col-md-offset-2 col-md-8">
+		<h4>Comments</h4>
+		{% for comment in comments %}
 			<div class="row">
-				<div class="col-xs-12">
-					<form action="/comment/create" method="POST">
-						<input type="hidden" name="post-id" value="{{slug}}">
-						<textarea class="comment-box" name="comment"></textarea>
-						<button type="submit" class="btn btn-large" id="comment-submit">Submit Comment</button>
-					</form>
+				<div class="col-md-12">
+					<p class="comment-body">{{comment.body}}</p>
+					<span class="author">{{comment.author}}</span>
+					<span class="timestamp">{{comment.created}}</span>
+					{% if comment.author == currentuser %}
+						<button class="btn btn-large btn-info edit-comment" data-id="{{comment.key().id()}}">Edit Comment</button>
+						<button class="btn btn-large btn-danger delete-comment" data-id="{{comment.key().id()}}">Delete Comment</button>
+					{% endif %}
 				</div>
+			</div>
+		{% endfor %}
+		<div class="row">
+			<div class="col-md-12">
+				<form action="/comment/create" method="POST">
+					<input type="hidden" name="post-id" value="{{slug}}">
+					<textarea class="comment-box" name="comment"></textarea>
+					<button type="submit" class="btn btn-large" id="comment-submit">Submit Comment</button>
+				</form>
 			</div>
 		</div>
 	</div>
-	<script>
-		$('#likebutton').click(function(){
-			$.post({url: "/post/like/{{slug}}"}).done(function(data){
-				if (data.result == "liked")
-					$('#likebutton').addClass("liked")
-				else if (data.result == "unliked")
-					$('#likebutton').removeClass("liked")
-				if (data.numlikes >= 0)
-					$('#likes').html(data.numlikes)
+</div>
+<script>
+	$('#likebutton').click(function(){
+		$.post({url: "/post/like/{{slug}}"}).done(function(data){
+			if (data.result == "liked")
+				$('#likebutton').addClass("liked")
+			else if (data.result == "unliked")
+				$('#likebutton').removeClass("liked")
+			if (data.numlikes >= 0)
+				$('#likes').html(data.numlikes)
 
-				if (data.error) {
-					$(".error-msg").html(data.error)
-					$(".alert").removeClass('hidden')
-				} else {
-					$(".alert").addClass('hidden')
-				}
-			})
-		});
+			if (data.error) {
+				$(".error-msg").html(data.error)
+				$(".alert").removeClass('hidden')
+			} else {
+				$(".alert").addClass('hidden')
+			}
+		})
+	});
 
-		$('#edit-post').click(function() {
-			location.href = "/post/edit/{{slug}}"
-		});
+	$('#edit-post').click(function() {
+		location.href = "/post/edit/{{slug}}"
+	});
 
-		$('#delete-post').click(function() {
-			$("<form action='/post/delete/{{slug}}' method='POST'></form>").submit();
-		});
+	$('#delete-post').click(function() {
+		$("<form action='/post/delete/{{slug}}' method='POST'></form>").submit();
+	});
 
-		$('.edit-comment').click(function() {
-			location.href = '/comment/edit/{{slug}}/' + $(this).attr('data-id')
-		});
+	$('.edit-comment').click(function() {
+		location.href = '/comment/edit/{{slug}}/' + $(this).attr('data-id')
+	});
 
-		$('.delete-comment').click(function() {
-			$("<form action='/comment/delete/{{slug}}/" + $(this).attr('data-id') + "' method='POST'></form>").submit()
-		});
-	</script>
+	$('.delete-comment').click(function() {
+		$("<form action='/comment/delete/{{slug}}/" + $(this).attr('data-id') + "' method='POST'></form>").submit()
+	});
+</script>
 {% endblock %}

@@ -175,6 +175,7 @@ class EditPost(Handler):
                                     signedin=True)
                         return
 
+                time.sleep(0.1)
                 self.redirect("/post/view/"+slug)
                 return
 
@@ -237,7 +238,7 @@ class LikePost(Handler):
             if post:
                 result = models.Like.toggle(user=self.username, post=post)
                 if result is False:
-                    error = "Author's cannot like their own posts"
+                    error = "Authors cannot like their own posts"
                 else:
                     error = None
             else:

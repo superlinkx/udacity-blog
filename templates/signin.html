@@ -9,19 +9,37 @@
 {% block heading %}Sign In{% endblock %}
 {% block content %}
 <div class="row">
-	<div class="col-xs-12">
+	<div class="col-sm-12">
 		Not a user? <a href="/signup">Signup!</a>
 	</div>
 </div>
-	<div class="row">
-		<form action="/signin" method="post" id="signin-form" class="col-xs-12">
-			<label for="username">Username:</label>
-			<input type="text" name="username" value="{{username}}">
-			<label for="password">Password:</label>
-			<input type="password" name="password" value="{{password}}">
-			<label for="setcookie">Stay Signed In:</label>
-			<input type="checkbox" name="setcookie" {% if setcookie != None %}checked{% endif %}>
-			<button type="submit" class="btn btn-large">Sign In</button>
+<div class="row">
+	<div class="col-sm-12">
+		<form action="/signin" method="post" id="signin-form" class="form-horizontal">
+			<div class="form-group">
+				<label class="col-sm-offset-1 col-sm-2 control-label" for="username">Username:</label>
+				<div class="col-sm-6">
+					<input type="text" name="username" value="{{username}}">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-offset-1 col-sm-2 control-label" for="password">Password:</label>
+				<div class="col-sm-6">
+					<input type="password" name="password" value="{{password}}">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-offset-1 col-sm-2 control-label" for="setcookie">Stay Signed In:</label>
+				<div class="col-sm-6">
+					<input type="checkbox" name="setcookie" {% if setcookie != None %}checked{% endif %}>
+				</div>
+			</div>
+			<div class="form-group">
+				<div class="col-sm-offset-3 col-sm-6">
+					<button type="submit" class="btn btn-large">Sign In</button>
+				</div>
+			</div>
 		</form>
 	</div>
+</div>
 {% endblock %}
