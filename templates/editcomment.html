@@ -12,7 +12,13 @@
 		<form action="/comment/edit/{{slug}}/{{cid}}" method="post" id="editcomment-form" class="col-xs-12">
 			<label for="body">Comment:</label>
 			<textarea name="body">{{body}}</textarea>
+			<button class="btn btn-large" id="cancel">Cancel</button>
 			<button type="submit" class="btn btn-large">Submit Comment</button>
 		</form>
+		<script>
+			$("#cancel").click(function() {
+				location.href = "/post/view/{{slug}}";
+			});
+		</script>
 	</div>
 {% endblock %}
