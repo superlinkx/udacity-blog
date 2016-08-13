@@ -51,6 +51,10 @@ header .btn {
 	height: 75px;
 }
 
+.comment-meta {
+	font-style: italic;
+}
+
 /* Mobile Media Queries */
 @media only screen and (max-width: 767px) {
 

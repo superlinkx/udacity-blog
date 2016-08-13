@@ -14,11 +14,11 @@
 	<body class="container">
 		{% block error %}{% endblock %}
 		<header class="row vertical-align">
-			<div class="heading col-xs-6">
+			<div class="heading col-xs-6 col-md-offset-2 col-md-4">
 				<a href="/"><h1>My Blog</h1></a>
 				<h2>{% block heading %}{% endblock %}</h2>
 			</div>
-			<div class="col-xs-6">
+			<div class="col-xs-6 col-md-4">
 				<div class="pull-right">
 					{% if signedin == False %}
 					<button class="btn btn-large btn-success" id="signin-button">Sign In</button>

@@ -34,22 +34,30 @@
 {% endif %}
 <div class="row">
 	<div class="col-md-offset-2 col-md-8">
+		<hr>
 		<h4>Comments</h4>
 		{% for comment in comments %}
 			<div class="row">
 				<div class="col-md-12">
+					<hr>
 					<p class="comment-body">{{comment.body}}</p>
-					<span class="author">{{comment.author}}</span>
-					<span class="timestamp">{{comment.created}}</span>
-					{% if comment.author == currentuser %}
-						<button class="btn btn-large btn-info edit-comment" data-id="{{comment.key().id()}}">Edit Comment</button>
-						<button class="btn btn-large btn-danger delete-comment" data-id="{{comment.key().id()}}">Delete Comment</button>
-					{% endif %}
 				</div>
+				<div class="col-md-12 comment-meta">
+					<span class="author">{{comment.author}}</span>
+					<span class="timestamp"> | {{comment.created.strftime('%m/%d/%Y - %H:%M')}}</span>
+				</div>
+				{% if comment.author == currentuser %}
+				<div class="col-md-12">
+					<hr>
+					<button class="btn btn-large btn-info edit-comment" data-id="{{comment.key().id()}}">Edit Comment</button>
+					<button class="btn btn-large btn-danger delete-comment" data-id="{{comment.key().id()}}">Delete Comment</button>
+				</div>
+				{% endif %}
 			</div>
 		{% endfor %}
 		<div class="row">
 			<div class="col-md-12">
+				<hr>
 				<form action="/comment/create" method="POST">
 					<input type="hidden" name="post-id" value="{{slug}}">
 					<textarea class="comment-box" name="comment"></textarea>
