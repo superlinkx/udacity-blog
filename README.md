@@ -3,6 +3,9 @@
 
 This is a blog written on App Engine for my Full Stack nanodegree
 
+### Accessing the demo
+An online demo can be seen at (superlinkx-example-blog.appspot.com)[]
+
 ### Running a development version
 #### Requirements
 - Google App Engine SDK for Python [Download and install instructions](https://cloud.google.com/appengine/downloads#Google_App_Engine_SDK_for_Python)
