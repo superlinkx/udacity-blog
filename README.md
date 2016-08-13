@@ -4,7 +4,7 @@
 This is a blog written on App Engine for my Full Stack nanodegree
 
 ### Accessing the demo
-An online demo can be seen at [](superlinkx-example-blog.appspot.com)
+An online demo can be seen at [superlinkx-example-blog.appspot.com](superlinkx-example-blog.appspot.com)
 
 ### Running a development version
 #### Requirements
