@@ -78,8 +78,12 @@
 				$('#likes').html(data.numlikes)
 
 			if (data.error) {
-				$(".error-msg").html(data.error)
-				$(".alert").removeClass('hidden')
+				if (data.error === "Not logged in") {
+					location.href = "/signin"
+				} else {
+					$(".error-msg").html(data.error)
+					$(".alert").removeClass('hidden')
+				}
 			} else {
 				$(".alert").addClass('hidden')
 			}
